@@ -120,8 +120,87 @@ tos_wos <- function(file) {
     
 }
 
-# Probando esta rama 
+
+# Visualizacion del grafo  segun el indeegre
+
+ind <- degree(graph_2, mode="in")
+G1  <- as.undirected(graph_2)
+cluster <- cluster_louvain(G1)
+coords = layout_with_fr(G1)
+plot(G1, vertex.color=rainbow(3, alpha=0.6)[cluster$membership], vertex.label = NA,  vertex.size= ind*5)
+
+# Visualizacion del grafo segun el outdegree
+
+out <- degree(graph_2, mode="out")
+clusterlouvain <- cluster_louvain(G1)
+coords = layout_with_fr(G1)
+plot(G1, vertex.color=rainbow(3, alpha=0.6)[clusterlouvain$membership], vertex.label = NA,  vertex.size= out)
 
 
+# Grafico 2 
+
+
+tos.labels     <- c()
+Nombres.Vertex <- V(G1)$name 
+
+
+for (nombre in Nombres.Vertex)
+{
+    if (nombre %in% tos$id) {
+        tos.labels <- c(tos.labels, tos$ToS[tos$id == nombre])
+    }
+    
+    else{
+        tos.labels <- c(tos.labels, NA)
+    }
+}
+
+# Coordenadas segun numero de comunidad 
+coordenadas    <- as.data.frame(cluster$membership*cos(-cluster$membership/3))
+names(coordenadas)[names(coordenadas) == 'cluster$membership'] <- 'V1'
+coordenadas$V2 <- cluster$membership*sin(-cluster$membership/3) 
+coordenadas    <- as.matrix.data.frame(coordenadas) + 0.8*replicate(2, rnorm(length(cluster$membership))) 
+cluster        <-  cluster_louvain(G1)
+coords         <- layout_with_fr(G1)
+
+aristas <- edge_betweenness(graph_2, e = E(graph_2), directed = TRUE,weights = NULL)
+
+plot(cluster,
+     G1,
+     vertex.label = tos.labels, 
+     vertex.color = cluster$membership,
+     vertex.size  = 0.5*ind,
+     layout       = coordenadas, 
+     edge.color   = "black",
+     edge.lty     = 2, 
+     edge.width   = aristas*0.05,
+     label.dist   = 100,
+     vertex.label.font  = 1,
+     vertex.label.cex   = 0.6,
+     vertex.label.color = "red")
+
+# Coordenadas segun indegree 
+coordenadas    <- as.data.frame(ind*cos(-ind))
+names(coordenadas)[names(coordenadas) == 'cluster$membership'] <- 'V1'
+coordenadas$V2 <- ind*sin(-ind) 
+coordenadas    <- as.matrix.data.frame(coordenadas) + 0.5*replicate(2, rnorm(length(cluster$membership))) 
+cluster        <-  cluster_louvain(G1)
+coords         <- layout_with_fr(G1)
+
+aristas <- edge_betweenness(graph_2, e = E(graph_2), directed = TRUE,weights = NULL)
+
+plot(cluster,
+     G1,
+     vertex.label = tos.labels, 
+     vertex.color = cluster$membership,
+     vertex.size  = 0.5*ind,
+     layout       = coordenadas, 
+     edge.color   = "black",
+     edge.lty     = 2, 
+     edge.width   = aristas*0.05,
+     label.dist   = 100,
+     vertex.label.font  = 1,
+     vertex.label.cex   = 0.6,
+     vertex.label.color = "red")
 
 
